@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ShuffleCards } from "./Shuffle";
 import { Gameover, Winner } from "./GameOver";
 
@@ -17,11 +17,20 @@ export default function Cards({ cards, setCards }) {
     } else {
       setCards(ShuffleCards(cards));
       setClicked([...clicked, card.pokemon]);
-      setScore((score) => score + 1);
+      setScore((score) => {
+        if (score + 1 > bestscore) setBestScore(score + 1);
+        return score + 1;
+      });
       if (clicked.length + 1 === cards.length) {
         setShow(true);
       }
     }
+  };
+
+  const restartGame = () => {
+    setClicked([]);
+    setScore(0);
+    setShow(false);
   };
 
   return (
@@ -36,29 +45,31 @@ export default function Cards({ cards, setCards }) {
           <div className="value">{bestscore}</div>
         </div>
       </div>
- 
+
       <div className="cards-grid">
-        {cards && cards.map((card, index) => (
-          <div
-            key={index}
-            className={`card ${show ? "disabled" : ""}`}
-            onClick={() => handleClick(card)}
-          >
-            {card.image && (
-              <img src={card.image} alt={card.pokemon} />
-            )}
-            <p className="pokemon-name">{card.pokemon}</p>
-          </div>
-        ))}
+        {cards &&
+          cards.map((card, index) => (
+            <div
+              key={index}
+              className={`card ${show ? "disabled" : ""}`}
+              onClick={() => handleClick(card)}
+            >
+              {card.image && <img src={card.image} alt={card.pokemon} />}
+              <p className="pokemon-name">{card.pokemon}</p>
+            </div>
+          ))}
       </div>
- 
-      {show && (
-        score === 0 ? (
-          <Gameover bestscore={bestscore} show={show} setShow={setShow} />
+
+      {show &&
+        (score === 0 ? (
+          <Gameover bestscore={bestscore} show={show}  restart={restartGame} />
         ) : (
-          <Winner score={score} show={show} setShow={setShow} />
-        )
-      )}
+          <Winner
+            score={score}
+            show={show}
+            restart={restartGame}
+          />
+        ))}
     </>
   );
 }

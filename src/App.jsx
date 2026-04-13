@@ -24,29 +24,54 @@ function App() {
     { pokemon: "lucario", image: "" },
   ]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const fetchAllData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const fetchData = cards.map((card) =>
+        fetch(`https://pokeapi.co/api/v2/pokemon/${card.pokemon}`),
+      );
+      const responses = await Promise.all(fetchData);
+      const jsonPromise = responses.map((response) => response.json());
+      const data = await Promise.all(jsonPromise);
+      setCards(
+        cards.map((card, index) => ({
+          ...card,
+          image: data[index].sprites.other["official-artwork"].front_default,
+        })),
+      );
+    } catch (err) {
+      setError(err.message);
+      setCards(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchAllData = async () => {
-      try {
-        const fetchData = cards.map((card) =>
-          fetch(`https://pokeapi.co/api/v2/pokemon/${card.pokemon}`),
-        );
-        const responses = await Promise.all(fetchData);
-        const jsonPromise = responses.map((response) => response.json());
-        const data = await Promise.all(jsonPromise);
-        setCards(
-          cards.map((card, index) => ({
-            ...card,
-            image: data[index].sprites.other["official-artwork"].front_default
-          })),
-        );
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-        setCards(null);
-      }
-    };
     fetchAllData();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="header">
+        <h1>Pokémon Memory</h1>
+        <p className="loading">Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="header">
+        <h1>Pokémon Memory</h1>
+        <p className="error-msg">There occured an error!</p>
+        {/* Style this button later lol */}
+        <button onClick={async () => fetchAllData()}>Try Again</button>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -54,10 +79,9 @@ function App() {
         <h1>Pokémon Memory</h1>
         <p>Click each Pokémon only once — don't repeat!</p>
       </div>
-      <Cards cards={cards} setCards={setCards} />
+      {<Cards cards={cards} setCards={setCards} />}
     </div>
   );
 }
-
 
 export default App;
