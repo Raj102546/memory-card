@@ -1,4 +1,4 @@
-export function Gameover({ bestscore, show, setShow }) {
+export function Gameover({ bestscore, show, restart }) {
   return (
     <>
       {show && (
@@ -8,7 +8,7 @@ export function Gameover({ bestscore, show, setShow }) {
             <h2>Game Over!</h2>
             <p>Best Score</p>
             <div className="final-score">{bestscore}</div>
-            <button onClick={() => setShow(false)}>Try Again</button>
+            <button onClick={() => restart()}>Try Again</button>
           </div>
         </div>
       )}
@@ -16,7 +16,7 @@ export function Gameover({ bestscore, show, setShow }) {
   );
 }
 
-export function Winner({ score, show, setShow }) {
+export function Winner({ score, show, restart }) {
   return (
     <>
       {show && (
@@ -26,7 +26,7 @@ export function Winner({ score, show, setShow }) {
             <h2>You Won!</h2>
             <p>Perfect Score</p>
             <div className="final-score">{score}</div>
-            <button onClick={() => setShow(false)}>Play Again</button>
+            <button onClick={() => restart()}>Play Again</button>
           </div>
         </div>
       )}
